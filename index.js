@@ -26,9 +26,9 @@ database.once('connected', () => {
 })
 
 
-
-app.listen(3000, () => {
-    console.log('Sever started at port 3000');
+const port = process.env.npm_config_port || process.env.PORT || 3000
+app.listen(port, () => {
+    console.log(`Sever started at port ${port}`);
 })
 
 
