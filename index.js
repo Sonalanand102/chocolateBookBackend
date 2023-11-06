@@ -5,9 +5,10 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const mongoString = process.env.DATABASE_URL
 const routes = require('./routes/routes');
-
+const morgan = require('morgan')
 
 const app = express();
+app.use(morgan('dev'));
 app.use(cors());
 app.options('*', cors());
 app.use(express.json());
