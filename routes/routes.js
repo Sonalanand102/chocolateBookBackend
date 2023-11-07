@@ -76,7 +76,7 @@ router.patch('/updateCheckOutList', async (req, res) => {
       const filter = { _id: { $in: ids } };
   
       // Define the update to set the "status" field to 1 for all matched documents
-      const update = { $set: { status: false } };
+      const update = { $set: { status: true } };
   
       // Use updateMany to update the matching documents
       const result = await Model.updateMany(filter, update);
