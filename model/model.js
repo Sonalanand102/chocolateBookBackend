@@ -17,8 +17,8 @@ const dataSchema = new mongoose.Schema({
     },
 
     status : {
-        type: Number,
-        default: 0,
+        type: Boolean,
+        default: false
     },
 
 })

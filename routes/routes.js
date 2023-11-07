@@ -49,6 +49,28 @@ router.patch('/update/:id', (req, res) => {
     res.send('Update by ID API')
 })
 
+router.patch('/updateCheckOutList', async (req, res) => {
+    try {
+      const updateData = req.body; // An array of objects representing updates
+  
+      // Extract the IDs from each object
+      const ids = updateData.map(item => item.id);
+  
+      // Create a filter to match the documents based on their IDs
+      const filter = { _id: { $in: ids } };
+  
+      // Define the update to set the "status" field to 1 for all matched documents
+      const update = { $set: { status: true } };
+  
+      // Use updateMany to update the matching documents
+      const result = await Model.updateMany(filter, update);
+  
+      res.send(result);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
 //Delete by ID Method
 router.delete('/delete/:id', async (req, res) => {
     try {
