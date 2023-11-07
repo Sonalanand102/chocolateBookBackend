@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 
 const dataSchema = new mongoose.Schema({
     name : {
-        
         type: String,
         required : true,
     },
@@ -13,9 +12,13 @@ const dataSchema = new mongoose.Schema({
     },
 
     chocolateName : {
-        
         type: String,
         required : true,
+    },
+
+    status : {
+        type: Number,
+        default: 0,
     },
 
 })
