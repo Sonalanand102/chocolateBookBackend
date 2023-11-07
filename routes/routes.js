@@ -33,6 +33,22 @@ router.get('/getAllKhataList', async (req, res) => {
     }
 })
 
+router.get('/getCheckListByStatus/:status', async (req, res) => {
+    try {
+        const status = req.params.status === 'true'; // Convert the string parameter to a boolean
+
+        // Create a filter to match documents with the specified "status" value
+        const filter = { status };
+  
+      // Use Mongoose's find method to retrieve documents that match the filter
+      const data = await Model.find(filter);
+  
+      res.json(data);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
 //Get by ID Method
 router.get('/getOne/:id', async (req, res) => {
     try{
@@ -60,7 +76,7 @@ router.patch('/updateCheckOutList', async (req, res) => {
       const filter = { _id: { $in: ids } };
   
       // Define the update to set the "status" field to 1 for all matched documents
-      const update = { $set: { status: true } };
+      const update = { $set: { status: false } };
   
       // Use updateMany to update the matching documents
       const result = await Model.updateMany(filter, update);
