@@ -1,6 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const Model = require('../model/model')
+const multer = require('multer');
+const admin = require('firebase-admin');
+
+// Multer Configuration
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+//Firebase Admin SDK Initialization
+const serviceAccount = require('/Users/sonalanand/secure/chocolatebook-a2ad0-firebase-adminsdk-crs8l-9861a85879.json');
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: 'https://chocolatebook-a2ad0-default-rtdb.asia-southeast1.firebasedatabase.app',
+    storageBucket: 'gs://chocolatebook-a2ad0.appspot.com'
+  });
+
 
 //Post Method
 router.post('/post', async (req, res) => {
@@ -22,6 +37,49 @@ router.post('/post', async (req, res) => {
     }
 })
 
+
+// Endpoint for file upload
+router.post('/addChocolates', upload.single('file'), async (req, res) => {
+    console.log('kya kiya jae');
+    console.log(req.headers);
+    console.log('req.headers');
+    try {
+        console.log(req.headers);
+        const file = req.file;
+        const data = req.body;
+    
+        // Save file to Firebase Storage
+        const bucket = admin.storage().bucket();
+        const fileUpload = bucket.file(file.originalname);
+        const stream = fileUpload.createWriteStream({
+          metadata: {
+            contentType: file.mimetype,
+          },
+        });
+    
+        stream.end(file.buffer);
+    
+        // Wait for the file to be uploaded
+        await new Promise((resolve, reject) => {
+          stream.on('finish', resolve);
+          stream.on('error', reject);
+        });
+        const fileUrl = `https://storage.googleapis.com/${bucket.name}/${fileUpload.name}`;
+
+        // Save file URL and data to Firebase Realtime Database
+        const db = admin.database();
+        const ref = db.ref('chocolateBook');
+        const newDataRef = ref.push();
+        newDataRef.set({ fileUrl, ...data });
+    
+        res.status(200).json({ message: 'File and data uploaded successfully.' });
+      } catch (error) {
+        console.error('Error uploading file:', error);
+        res.status(500).json({ error: 'Internal server error.' });
+      }
+    });
+    
+  
 //Get all Method
 router.get('/getAllKhataList', async (req, res) => {
     try{
@@ -32,6 +90,22 @@ router.get('/getAllKhataList', async (req, res) => {
         res.status(500).json({message: error.message})
     }
 })
+
+router.get('/getAllChocolist', async (req, res) => {
+  try {
+    const db = admin.database();
+    const ref = db.ref('chocolateBook'); 
+
+    // Fetch data from the database
+    const snapshot = await ref.once('value');
+    const data = snapshot.val();
+
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    res.status(500).json({ error: 'Internal server error.' });
+  }
+});
 
 router.get('/getCheckListByStatus/:status', async (req, res) => {
     try {
