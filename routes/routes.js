@@ -9,7 +9,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 //Firebase Admin SDK Initialization
-const serviceAccount = require('/Users/sonalanand/secure/chocolatebook-a2ad0-firebase-adminsdk-crs8l-9861a85879.json');
+const serviceAccount = require('../chocolatebook-a2ad0-firebase-adminsdk-crs8l-9861a85879.json');
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
     databaseURL: 'https://chocolatebook-a2ad0-default-rtdb.asia-southeast1.firebasedatabase.app',
