@@ -16,6 +16,11 @@ const dataSchema = new mongoose.Schema({
         required : true,
     },
 
+    chocolateImage : {
+        type: String,
+        required : true,
+    },
+
     status : {
         type: Boolean,
         default: false

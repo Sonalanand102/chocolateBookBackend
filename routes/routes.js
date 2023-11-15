@@ -23,7 +23,8 @@ router.post('/post', async (req, res) => {
     const data = new Model({
         name: req.body.name,
         date: req.body.date,
-        chocolateName: req.body.chocolateName
+        chocolateName: req.body.chocolateName,
+        chocolateImage : req.body.chocolateImageUrl
     })
     
     try{
@@ -40,9 +41,6 @@ router.post('/post', async (req, res) => {
 
 // Endpoint for file upload
 router.post('/addChocolates', upload.single('file'), async (req, res) => {
-    console.log('kya kiya jae');
-    console.log(req.headers);
-    console.log('req.headers');
     try {
         console.log(req.headers);
         const file = req.file;
@@ -172,4 +170,36 @@ router.delete('/delete/:id', async (req, res) => {
         res.status(400).json({ message: error.message })
     }
 })
+
+// Delete chocolate api
+router.delete('/api/deleteChocolate/:date', async (req, res) => {
+  const { date } = req.params;
+
+  if (!date) {
+    return res.status(400).json({ error: 'Invalid request. Missing date parameter.' });
+  }
+
+  const dataRef = admin.database().ref('chocolateBook');
+
+  try {
+    // Find objects with the specified date
+    const snapshot = await dataRef.orderByChild('date').equalTo(date).once('value');
+
+    if (snapshot.exists()) {
+      // Get the keys of all matching objects
+      const objectKeys = Object.keys(snapshot.val());
+
+      // Use Promise.all for parallel deletion of all matching objects
+      await Promise.all(objectKeys.map(key => dataRef.child(key).remove()));
+
+      res.status(200).json({ message: 'Data deleted successfully' });
+    } else {
+      // No matching object found
+      res.status(404).json({ error: 'Object not found' });
+    }
+  } catch (error) {
+    console.error('Error deleting data:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 module.exports = router;
